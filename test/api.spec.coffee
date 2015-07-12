@@ -87,6 +87,16 @@ describe 'nicoliveIo',->
 
       if process.env.TRAVIS
         console.log 'fold:start:debug'
+        console.log 'getplayerstatus'
+        console.log playerStatus
+        console.log 'fold:end:debug'
+
+    client.on 'getpostkey',(postkey)->
+      expect(postkey).toBeTruthy()
+      
+      if process.env.TRAVIS
+        console.log 'fold:start:debug'
+        console.log 'getpostkey'
         console.log playerStatus
         console.log 'fold:end:debug'
 
