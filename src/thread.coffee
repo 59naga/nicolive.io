@@ -74,6 +74,11 @@ class Thread extends Socket
     $chat.text comment.toString()
     data= $.html()+'\0'
 
+    if process.env.TRAVIS
+      console.log 'fold:start:comment'
+      console.log data
+      console.log 'fold:env:comment'
+
     @write data
 
 module.exports.Thread= Thread

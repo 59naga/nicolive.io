@@ -106,7 +106,7 @@ class NicoliveIo extends Socketio
     .spread (response,postkeyBody)->
       [...,postkey]= postkeyBody.split '='
 
-      console.log response if process.env.TRAVIS
+      console.log postkey if process.env.TRAVIS
       console.log 'fold:end:getPostkey'
 
       postkey
