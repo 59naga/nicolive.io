@@ -78,11 +78,11 @@ describe 'nicoliveIo',->
 
         done() if i is 5
 
-  it 'anonymous comment at co2183236',(done)->
+  it 'anonymous comment at nsen/hotaru',(done)->
     comment= Date.now()+' via '
     comment+= if process.env.TRAVIS then 'TravisCI' else 'NicoliveIo'
 
-    client.emit 'view','co2183236'
+    client.emit 'view','nsen/hotaru'
     client.on 'getplayerstatus',(playerStatus)->
       {port,addr,thread}= playerStatus
       expect(port).toBeGreaterThan 200
@@ -91,8 +91,8 @@ describe 'nicoliveIo',->
 
       {id,title,picture_url}= playerStatus
       expect(id).toMatch /^lv/
-      expect(title).toMatch 'ブラウザベースのコメントビューアつくってる'
-      expect(picture_url).toMatch 'http://icon.nimg.jp/community/218/co2183236.jpg'
+      expect(title).toBe 'Nsen - 蛍の光チャンネル'
+      expect(picture_url).toMatch 'http://nl.simg.jp/img/a35/103321.39a510.jpg'
 
     client.on 'thread',(thread)->
       expect(thread.resultcode).toBe '0'
