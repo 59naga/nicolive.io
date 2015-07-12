@@ -16,7 +16,7 @@ $ npm install nicolive.io --save
 
 ### 課題
 
-従来のコメントビューアと同じく、ブラウザに埋め込まれた[userSession](#userSessionについて)をクッキーから取得する手段が必要です。
+従来のコメントビューアと同じく、ブラウザに埋め込まれた[userSession](#userSession)をクッキーから取得する手段が必要です。
 このモジュールでは、userSessionを取得していることを前提にしており、ブラウザ側のユーティリティを一切提供しません。
 
 # API
@@ -62,6 +62,18 @@ console.log(nicoliveIo instanceof NicoliveIo);
 `NicoliveIo`コンストラクタの第一引数に任意の`requestListener`を渡すことで、`socket.io`が補足しなかったrequestイベントを、渡した`requestListner`で受信できます。
 以下は例では、Express4を`requestListner`に使用して、socket.ioサーバーと静的ファイルサーバーの両方を`http://localhost:59798`上に起動します。
 
+```bash
+npm install express --save
+
+mkdir public
+echo 'nicolive.io is available' > public/index.html
+
+node app.js
+// Listen at http://localhost:59798
+```
+
+`app.js`
+
 ```js
 // Dependencies
 var express= require('express');
@@ -69,7 +81,7 @@ var NicoliveIo= require('nicolive.io').NicoliveIo;
 
 // Setup express
 var app= express();
-app.use('public',express.static());
+app.use(express.static('public'));
 
 // Setup nicolive.io
 var server= new NicoliveIo(app);
@@ -182,7 +194,7 @@ serverSocket.on('chat_result',function(chat_result){
 </script>
 ```
 
-### userSessionについて
+### userSessionについて <a id="userSession"></a>
 
 userSessionは、ニコニコ生放送内で、以下をアドレスバーに実行すると取得できます。
 
