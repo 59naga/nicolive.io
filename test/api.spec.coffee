@@ -75,7 +75,7 @@ describe 'nicoliveIo',->
       done()
     ,1000
 
-  it 'anonymous comment at nsen/hotaru',(done)->
+  fit 'anonymous comment at nsen/hotaru',(done)->
     comment= Date.now()+' via NicoliveIo'
 
     client.emit 'view','nsen/hotaru'
@@ -84,14 +84,12 @@ describe 'nicoliveIo',->
 
       if process.env.TRAVIS
         console.log 'fold:start:getpostkey'
-        console.log playerStatus
+        console.log postkey
         console.log 'fold:end:getpostkey'
 
     client.on 'thread',(thread)->
       expect(thread.resultcode).toBe '0'
       expect(thread.revision).toBe '1'
-
-      console.log 'on thread'
 
       client.emit 'comment',comment
       client.once 'chat_result',(chat_result)->
