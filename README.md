@@ -105,11 +105,11 @@ server.listen(59798,function(){
 サーバーへ接続に成功したclientのEventEmitterインスタンスを、callback関数に渡します。
 NicoliveIoはclientと接続が確立した時に、自動でイベントを追加します。追加するイベントは下記のとおりです。
 
-### clientSocket event:'auth'
+### clientSocketEvent:`auth`
 
 clientからuserSessionを受け取り、getplayerstatusへアクセスします。userSessionが有効であれば`authorized`イベントを、不正であれば`error`イベントを送信します。
 
-### clientSocket event:'view'
+### clientSocketEvent:`view`
 
 clientからcannelIdを受け取り、getplayerstatusを経由してtcpでコメントに接続します。接続に成功すると、NicoliveIoはコメントサーバーから受信したxmlを解析し、解析結果でclientに送信し続けます。
 
@@ -117,14 +117,18 @@ clientからcannelIdを受け取り、getplayerstatusを経由してtcpでコメ
 
 * `thread`イベント:{resultcode,last_res,ticket,...} 接続したコメントサーバーの情報、接続が成功した時、はじめに１度だけイベントを発行する。resultcodeが'0'なら成功、それ以外なら失敗。失敗コードの詳細はresultcodeで検索してください。
 * `chat`イベント:{'thread','vpos','date','date_usec','user_id','premium','no','text'} コメント・運営コメント・広告コメントのパース結果
-* `chat_result`イベント:{{chat_attributes...},status} `clientSocket event:'comment'`を参照。statusが0であれば、コメントは受理されています。
+* `chat_result`イベント:{{chat_attributes...},status} `clientSocketEvent:`comment'`を参照。statusが0であれば、コメントは受理されています`
 
-### clientSocket event:'comment'
+### clientSocketEvent:`comment`
 
 clientにauthorizedイベントを送信済みであれば、コメントします。
 コメントの結果を`chat_result`イベントでclientに送信します。
 
-### clientSocket event:'disconnect'
+### clientSocketEvent:`error`
+
+サーバー側で発生した例外をこのイベントで補足し、clientに`warn`イベントを送信します。
+
+### clientSocketEvent:`disconnect`
 
 clientがdisconnectメソッドを実行すると、サーバーはただちにtcpを切断します。
 
@@ -210,7 +214,7 @@ document.cookie.split(/;\s*/).reduce(function(other,cookie){if(cookie.match(/^us
 // user_session_000000_0000000000000000000000000000000000000000000000000000000000000000
 ```
 
-### serverSocket event:'connect'
+### serverSocketEvent:`connect`
 
 起動したサーバーと接続に成功したとき、受信します。サーバーが再起動した時や、クライアントの回線異常により再接続した場合、２回以上イベントが発行することに注意してください。
 
@@ -222,7 +226,7 @@ serverSocket.on('connect',function(){
 // connected
 ```
 
-### serverSocket event:'authorized'
+### serverSocketEvent:`authorized`
 
 サーバーの`auth`イベントへuserSessionを送信し、認証に成功したとき、受信します。
 
@@ -240,7 +244,7 @@ serverSocket.on('authorized',function(debugPlayerStatus){
 // authorized {port: "2806", addr: "omsg103.live.nicovideo.jp", thread: "1450455950", user_id: "143728", premium: "1"...}
 ```
 
-### serverSocket event:'thread'
+### serverSocketEvent:`thread`
 
 サーバーの`view`イベントへチャンネルidを送信し、スレッドに接続できたとき、受信します。
 
@@ -269,7 +273,7 @@ serverSocket.on('chat',function(chat){
 // thread {resultcode: "0", thread: "1450455950", last_res: 1863, ticket: "0x14facd80", revision: "1"...}
 ```
 
-### serverSocket event:'chat'
+### serverSocketEvent:`chat`
 
 チャンネルidのコメント１件につき１イベントを受信します。
 
@@ -303,7 +307,7 @@ serverSocket.on('chat',function(chat){
 // chat {thread: "1450455950", vpos: "1299400", date: "1436653594", date_usec: "452674", user_id: "900000000"...}
 ```
 
-### serverSocket event:'chat_result'
+### serverSocketEvent:`chat_result`
 
 サーバーの`comment`イベントへ文章を送信し、結果が返ったとき、受信します。
 コールバックの第一引数には、成否の情報statusを含んでいます。
@@ -321,7 +325,7 @@ serverSocket.on('chat_result',function(chat_result){
 // chat_result {text:"てすてすてす", status: "0", thread: "1450455950", no: "1864", date: "1436653696", date_usec: "110007", mail: "184"...}
 ```
 
-### serverSocket event:'getplayerstatus'
+### serverSocketEvent:`getplayerstatus`
 
 このイベントはデバッグ用です。自身の`thread`イベントの直前に受信します。コールバックの第一引数には、サーバーが使用した接続に必要な最低限な情報と、getplayerstatusのパース前のxmlデータを含んでいます。
 
@@ -332,7 +336,7 @@ serverSocket.on('getplayerstatus',function(playerStatus){
 // getplayerstatus {addr: "omsg103.live.nicovideo.jp"port: "2806"premium: "1"thread: "1450455950"user_id: "143728"xml: "<?xml version="1.0" encoding="utf-8"?>↵<getplayerstatus status="ok" time="1436653695"><stream><id>lv227714286</id><title>Nsen - 蛍の光チャンネル</title><description>Nsenからの去り際に自主的にお立ち寄り下さい。Nsenをご堪能頂いた後、また、ネットサーフィンを終え眠りにつく時などにオススメです。</description>...</getplayerstatus>"}
 ```
 
-### serverSocket event:'getpostkey'
+### serverSocketEvent:`getpostkey`
 
 このイベントはデバッグ用です。自身の`chat_result`イベントの直前に受信します。コールバックの第一引数には、tcpサーバーへの書き込みに必要なpostkeyのみが渡されます。
 
@@ -341,6 +345,23 @@ serverSocket.on('getpostkey',function(postkey){
   console.log('getpostkey',postkey);
 });
 // getpostkey .1436653726.KL6uM4PMV8cKULkBJqXjdmm1Ye0
+```
+
+### serverSocketEvent:`warn`
+
+このイベントはデバッグ用です。サーバーが補足したエラーを受け取ります。
+
+```js
+serverSocket.emit('auth','anonymous coward');
+serverSocket.emit('view','nothing far');
+serverSocket.emit('comment','Im invalid user');
+
+serverSocket.on('warn',function(error){
+  console.log(error);
+});
+// notlogin
+// notfound
+// nothread
 ```
 
 # Test

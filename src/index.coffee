@@ -48,9 +48,12 @@ class NicoliveIo extends Socketio
         .then (playerStatus)->
           client.emit 'getplayerstatus',playerStatus
           client.thread= new Thread client,playerStatus,options
+        .catch (error)->
+          client.emit 'error',error
           
       client.on 'comment',(comment,attributes={})=>
         unless client.thread?.attributes
+          client.emit 'warn','nothread'
           return client.emit 'chat_result',{status:'-1',description:status['-1'].description}
 
         @getPostKey client.thread.attributes,client.userSession
@@ -59,7 +62,12 @@ class NicoliveIo extends Socketio
           attributes.postkey= postkey
           attributes.mail?= 184
           client.thread?.comment comment,attributes
+        .catch (error)->
+          client.emit 'error',error
 
+      client.on 'error',(error)->
+        client.emit 'warn',error
+      
       client.on 'disconnect',->
         client.thread.destroy() if client.thread?
         delete client.thread
@@ -73,7 +81,7 @@ class NicoliveIo extends Socketio
         Cookie: 'user_session='+userSession
     .spread (response,xml)->
       $= cheerio.load xml,{xmlMode:yes}
-      error= $('getPlayerStatus error code').text()
+      error= $('getplayerstatus error code').text()
 
       return Promise.reject error if error
 
@@ -83,7 +91,17 @@ class NicoliveIo extends Socketio
 
       user_id= $('user_id').eq(0).text()
       premium= $('is_premium').eq(0).text()
-      {port,addr,thread,user_id,premium,xml}
+
+      id= $('id').eq(0).text()
+      title= $('title').eq(0).text()
+      picture_url= $('picture_url').eq(0).text()
+
+      {
+        port,addr,thread
+        user_id,premium
+        id,title,picture_url
+        xml
+      }
 
   getPostKey: ({thread,last_res},userSession)->
     block_no= Math.round ((last_res+1)/100)

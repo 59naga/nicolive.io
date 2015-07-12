@@ -76,16 +76,21 @@ describe 'nicoliveIo',->
 
         done() if i is 5
 
-  it 'anonymous comment at nsen/hotaru',(done)->
+  it 'anonymous comment at co2183236',(done)->
     comment= Date.now()+' via '
     comment+= if process.env.TRAVIS then 'TravisCI' else 'NicoliveIo'
 
-    client.emit 'view','nsen/hotaru'
+    client.emit 'view','co2183236'
     client.on 'getplayerstatus',(playerStatus)->
       {port,addr,thread}= playerStatus
-      expect(port).toBeTruthy()
-      expect(addr).toBeTruthy()
-      expect(thread).toBeTruthy()
+      expect(port).toBeGreaterThan 200
+      expect(addr).toMatch /.live.nicovideo.jp$/
+      expect(thread).toBeGreaterThan 1000000000
+
+      {id,title,picture_url}= playerStatus
+      expect(id).toMatch /^lv/
+      expect(title).toMatch 'ブラウザベースのコメントビューアつくってる'
+      expect(picture_url).toMatch 'http://icon.nimg.jp/community/218/co2183236.jpg'
 
     client.on 'thread',(thread)->
       expect(thread.resultcode).toBe '0'
@@ -101,3 +106,24 @@ describe 'nicoliveIo',->
         expect(chat_result.text).toBe comment
 
         done()
+
+  describe 'Error handling',->
+    it 'invalid auth',(done)->
+      client.emit 'auth','そんなセッションない'
+      client.once 'warn',(error)->
+        expect(error).toBe 'notlogin'
+        done()
+
+    it 'invalid view',(done)->
+      client.emit 'view','そんなサーバーない'
+      client.once 'warn',(error)->
+        expect(error).toBe 'notfound'
+        done()
+
+    it 'invalid comment',(done)->
+      client.emit 'comment','ログインできてない'
+      client.once 'warn',(error)->
+        expect(error).toBe 'nothread'
+        done()
+
+  xit 'TODO: reconnect issue #1',->

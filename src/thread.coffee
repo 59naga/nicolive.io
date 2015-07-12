@@ -28,6 +28,17 @@ class Thread extends Socket
 
       @setEncoding 'utf-8'
 
+    @retry= null
+    @on 'connect',=>
+      @retry= 0
+    @on 'error',(error)->
+      console.error error
+    @on 'close',=>
+      return if @retry is null or @retry>=5
+
+      @retry++
+      @connect port,addr
+
     chunks= ''
     @on 'data',(chunk)=>
       chunks+= chunk
@@ -75,5 +86,9 @@ class Thread extends Socket
     data= $.html()+'\0'
 
     @write data
+
+  destroy: ->
+    @retry= null
+    super
 
 module.exports.Thread= Thread
