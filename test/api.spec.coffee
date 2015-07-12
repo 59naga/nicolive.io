@@ -11,6 +11,8 @@ request= Promise.promisify(require 'request')
 port= 59798
 userSession= process.env.SESSION
 
+throw new Error 'process.env.SESSION is undefined' unless userSession
+
 # Specs
 describe 'NicoliveIo using Express4',->
   io= null
@@ -124,6 +126,19 @@ describe 'nicoliveIo',->
       client.emit 'comment','ログインできてない'
       client.once 'warn',(error)->
         expect(error).toBe 'nothread'
+        done()
+       
+  describe 'fetch nickname',->
+    it 'fetch nickname',(done)->
+      client.emit 'nickname',143728,(error,nickname)->
+        expect(error).toBe null
+        expect(nickname).toBe '59'
+        done()
+
+    it 'invalid id',(done)->
+      client.emit 'nickname','fdafdsa',(error,nickname)->
+        expect(error).toBe 'idは数字を入力してください'
+        expect(nickname).toBeUndefined()
         done()
 
   xit 'TODO: reconnect issue #1',->

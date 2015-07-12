@@ -364,6 +364,25 @@ serverSocket.on('warn',function(error){
 // nothread
 ```
 
+## serverSocket.emit('nickname',user_id,callback) -> {error,nickname}
+
+[静画API](http://seiga.nicovideo.jp/api/user/info?id=143728)へアクセスしてユーザー名をコールバック関数に渡します。ユーザーが存在しない場合でも、nicknameが`-`のユーザーとして扱うことに注意してください。
+
+```js
+serverSocket.emit('nickname',143728,function(error,nickname){
+  console.log(nickname);// 59naga
+});
+
+serverSocket.emit('nickname',9999999999,function(error,nickname){
+  console.log(nickname);// -
+});
+
+serverSocket.emit('nickname','invalid',function(error,nickname){
+  console.log(error);// idは数字を入力してください
+  console.log(nickname);// undefined
+});
+```
+
 # Test
 
 ```bash

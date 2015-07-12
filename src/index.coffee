@@ -16,6 +16,7 @@ status= require './status'
 api=
   getPlayerStatus: 'http://live.nicovideo.jp/api/getplayerstatus/%s'
   getPostKey: 'http://live.nicovideo.jp/api/getpostkey'
+  fetchNickname: 'http://seiga.nicovideo.jp/api/user/info'
 
 # Public
 class NicoliveIo extends Socketio
@@ -64,6 +65,13 @@ class NicoliveIo extends Socketio
           client.thread?.comment comment,attributes
         .catch (error)->
           client.emit 'error',error
+
+      client.on 'nickname',(userId,callback)=>
+        @fetchNickname userId
+        .then (nickname)->
+          callback null,nickname
+        .catch (error)->
+          callback error
 
       client.on 'error',(error)->
         client.emit 'warn',error
@@ -116,7 +124,19 @@ class NicoliveIo extends Socketio
 
       postkey
 
-  listen: ->
+  fetchNickname: (userId)->
+    url= api.fetchNickname+'?id='+userId
+
+    request url
+    .spread (response,xml)->
+      $= cheerio.load xml,{xmlMode:yes}
+      error= $('errors error').text()
+
+      return Promise.reject error if error
+
+      $('nickname').text()
+
+  listen: ()->
     @server.listen arguments...
 
   close: ->
