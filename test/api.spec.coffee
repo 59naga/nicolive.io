@@ -109,9 +109,6 @@ describe 'nicoliveIo',->
 
         done()
 
-    client.on 'warn',(error)->
-      console.error error
-
   describe 'Error handling',->
     it 'invalid auth',(done)->
       client.emit 'auth','そんなセッションない'
