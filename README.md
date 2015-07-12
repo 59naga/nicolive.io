@@ -63,13 +63,13 @@ console.log(nicoliveIo instanceof NicoliveIo);
 以下は例では、Express4を`requestListner`に使用して、socket.ioサーバーと静的ファイルサーバーの両方を`http://localhost:59798`上に起動します。
 
 ```bash
-npm install express --save
+$ npm install express --save
 
-mkdir public
-echo 'nicolive.io is available' > public/index.html
+$ mkdir public
+$ echo 'nicolive.io is available' > public/index.html
 
-node app.js
-// Listen at http://localhost:59798
+$ node app.js
+# Listen at http://localhost:59798
 ```
 
 `app.js`
