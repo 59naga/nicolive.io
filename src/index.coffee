@@ -50,8 +50,6 @@ class NicoliveIo extends Socketio
           client.thread= new Thread client,playerStatus,options
           
       client.on 'comment',(comment,attributes={})=>
-        console.log arguments if process.env.TRAVIS
-
         unless client.thread?.attributes
           return client.emit 'chat_result',{status:'-1',description:status['-1'].description}
 
