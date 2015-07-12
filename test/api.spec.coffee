@@ -91,6 +91,8 @@ describe 'nicoliveIo',->
       expect(thread.resultcode).toBe '0'
       expect(thread.revision).toBe '1'
 
+      console.log 'on thread'
+
       client.emit 'comment',comment
       client.once 'chat_result',(chat_result)->
         expect(chat_result.status).toBe '0'
