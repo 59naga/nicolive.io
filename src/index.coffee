@@ -92,7 +92,7 @@ class NicoliveIo extends Socketio
       {port,addr,thread,user_id,premium,xml}
 
   getPostKey: ({thread,last_res},userSession)->
-    block_no= Math.floor (last_res+1)/100
+    block_no= Math.round ((last_res+1)/100)
     url= api.getPostKey+'?'+(querystring.stringify {thread,block_no})
 
     if process.env.TRAVIS
