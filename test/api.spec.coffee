@@ -75,30 +75,17 @@ describe 'nicoliveIo',->
       done()
     ,1000
 
-  fit 'anonymous comment at nsen/hotaru',(done)->
+  it 'anonymous comment at nsen/hotaru',(done)->
     comment= Date.now()+' via NicoliveIo'
 
     client.emit 'view','nsen/hotaru'
-    client.on 'getplayerstatus',(playerStatus)->
-      {port,addr,thread}= playerStatus
-      expect(port).toBeTruthy()
-      expect(addr).toBeTruthy()
-      expect(thread).toBeTruthy()
-
-      if process.env.TRAVIS
-        console.log 'fold:start:debug'
-        console.log 'getplayerstatus'
-        console.log playerStatus
-        console.log 'fold:end:debug'
-
     client.on 'getpostkey',(postkey)->
       expect(postkey).toBeTruthy()
-      
+
       if process.env.TRAVIS
-        console.log 'fold:start:debug'
-        console.log 'getpostkey'
+        console.log 'fold:start:getpostkey'
         console.log playerStatus
-        console.log 'fold:end:debug'
+        console.log 'fold:end:getpostkey'
 
     client.on 'thread',(thread)->
       expect(thread.resultcode).toBe '0'
