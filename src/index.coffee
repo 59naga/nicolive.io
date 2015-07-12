@@ -93,12 +93,19 @@ class NicoliveIo extends Socketio
     block_no= Math.floor (last_res+1)/100
     url= api.getPostKey+'?'+(querystring.stringify {thread,block_no})
 
+    if process.env.TRAVIS
+      console.log 'fold:start:getPostkey'
+      console.log url
+
     request
       url: url
       headers:
         Cookie: 'user_session='+userSession
     .spread (response,postkeyBody)->
       [...,postkey]= postkeyBody.split '='
+
+      console.log response if process.env.TRAVIS
+      console.log 'fold:end:getPostkey'
 
       postkey
 
