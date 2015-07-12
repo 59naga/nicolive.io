@@ -27,12 +27,8 @@ class NicoliveIo extends Socketio
         new Server (req,res)->
           res.writeHead 200,{'Content-Type':'text/html'}
           res.end '''
-            <head>
-              <script src="/socket.io/socket.io.js"></script>
-            </head>
-            <body>
-              <h1>Welcome to Underground...</h1>
-            </body>
+            <head><script src="/socket.io/socket.io.js"></script></head>
+            <body><h1>Welcome to Underground...</h1></body>
           '''
     super @server
 
@@ -95,19 +91,12 @@ class NicoliveIo extends Socketio
     block_no= Math.round ((last_res+1)/100)
     url= api.getPostKey+'?'+(querystring.stringify {thread,block_no})
 
-    if process.env.TRAVIS
-      console.log 'fold:start:getPostkey'
-      console.log url
-
     request
       url: url
       headers:
         Cookie: 'user_session='+userSession
     .spread (response,postkeyBody)->
       [...,postkey]= postkeyBody.split '='
-
-      console.log postkey if process.env.TRAVIS
-      console.log 'fold:end:getPostkey'
 
       postkey
 
