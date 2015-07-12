@@ -117,7 +117,7 @@ clientからcannelIdを受け取り、getplayerstatusを経由してtcpでコメ
 
 * `thread`イベント:{resultcode,last_res,ticket,...} 接続したコメントサーバーの情報、接続が成功した時、はじめに１度だけイベントを発行する。resultcodeが'0'なら成功、それ以外なら失敗。失敗コードの詳細はresultcodeで検索してください。
 * `chat`イベント:{'thread','vpos','date','date_usec','user_id','premium','no','text'} コメント・運営コメント・広告コメントのパース結果
-* `chat_result`イベント:{{chat_attributes...},status} `clientSocketEvent:`comment'`を参照。statusが0であれば、コメントは受理されています`
+* `chat_result`イベント:{{chat_attributes...},status} clientSocketEvent:`comment`を参照。statusが0であれば、コメントは受理されています
 
 ### clientSocketEvent:`comment`
 
