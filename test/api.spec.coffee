@@ -94,12 +94,10 @@ describe 'nicoliveIo',->
       expect(thread.resultcode).toBe '0'
       expect(thread.revision).toBe '1'
 
-      console.log thread
-
       client.emit 'comment',comment
       client.once 'chat_result',(chat_result)->
         expect(chat_result.status).toBe '0'
-        # expect(chat_result.description).toBe '受理されました'
+        expect(chat_result.description).toBe '受理されました'
         expect(chat_result.text).toBe comment
 
         done()
