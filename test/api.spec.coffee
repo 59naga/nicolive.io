@@ -57,14 +57,28 @@ describe 'nicoliveIo',->
     client.disconnect()
     nicoliveIo.close done
 
+  it 'anonymous comment at nsen/hotaru',(done)->
+    comment= Date.now()+' via '
+    comment+= if process.env.TRAVIS then 'TravisCI' else 'NicoliveIo'
+
+    client.emit 'view','nsen/hotaru'
+    client.on 'thread',(thread)->
+      expect(thread.resultcode).toBe '0'
+      expect(thread.revision).toBe '1'
+
+      client.emit 'comment',comment
+      client.on 'getpostkey',(postkey)->
+        expect(postkey).toBeTruthy()
+
+      client.once 'chat_result',(chat_result)->
+        expect(chat_result.status).toBe '0'
+        expect(chat_result.description).toBe '受理されました'
+        expect(chat_result.text).toBe comment
+
+        done()
+
   it 'view at nsen/hotaru',(done)->
     client.emit 'view','nsen/hotaru'
-    client.on 'getplayerstatus',(playerStatus)->
-      {port,addr,thread}= playerStatus
-      expect(port).toBeTruthy()
-      expect(addr).toBeTruthy()
-      expect(thread).toBeTruthy()
-
     client.on 'getplayerstatus',(playerStatus)->
       {port,addr,thread}= playerStatus
       expect(port).toBeGreaterThan 200
@@ -89,26 +103,6 @@ describe 'nicoliveIo',->
         i++
 
         done() if i is 5
-
-  it 'anonymous comment at nsen/hotaru',(done)->
-    comment= Date.now()+' via '
-    comment+= if process.env.TRAVIS then 'TravisCI' else 'NicoliveIo'
-
-    client.emit 'view','nsen/hotaru'
-    client.on 'thread',(thread)->
-      expect(thread.resultcode).toBe '0'
-      expect(thread.revision).toBe '1'
-
-      client.emit 'comment',comment
-      client.on 'getpostkey',(postkey)->
-        expect(postkey).toBeTruthy()
-
-      client.once 'chat_result',(chat_result)->
-        expect(chat_result.status).toBe '0'
-        expect(chat_result.description).toBe '受理されました'
-        expect(chat_result.text).toBe comment
-
-        done()
 
   describe 'Found current live',->
     it 'old to current',(done)->
