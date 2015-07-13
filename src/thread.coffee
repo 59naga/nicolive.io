@@ -63,6 +63,8 @@ class Thread extends Socket
         data.text= $chat.text()
 
         client.emit 'chat',data
+        if data.premium is '3' and data.text is '/disconnect'
+          client.emit 'end_of_thread',data
 
       for chat_result in $ 'chat_result'
         $chat_result= $ chat_result

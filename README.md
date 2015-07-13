@@ -389,6 +389,14 @@ serverSocket.emit('nickname','invalid',function(error,nickname){
 });
 ```
 
+### serverSocketEvent:`end_of_thread`
+
+問い合わせたチャンネルidが終了した／終了している場合、このイベントを受信します。後述の`current`イベントをサーバーに送信することで、次枠が開始していないか確認できます。
+
+## serverSocket.emit('current') -> playerStatus
+
+`view`イベントで問い合わせた配信のコミュニティidの現在配信中の配信情報を取得します。これは、`end_of_thread`イベントを受け取ってしばらく後、次枠が同じコミュニティで配信された時、検出できることを意味します。
+
 # Test
 
 ```bash

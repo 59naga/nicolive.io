@@ -16,6 +16,7 @@ status= require './status'
 api=
   getPlayerStatus: 'http://live.nicovideo.jp/api/getplayerstatus/%s'
   getPostKey: 'http://live.nicovideo.jp/api/getpostkey'
+  heartbeat: 'http://live.nicovideo.jp/api/heartbeat?v='
   fetchNickname: 'http://seiga.nicovideo.jp/api/user/info'
 
 # Public
@@ -47,6 +48,8 @@ class NicoliveIo extends Socketio
 
         @getPlayerStatus nicoliveId,client.userSession
         .then (playerStatus)->
+          client.playerStatus= playerStatus
+
           client.emit 'getplayerstatus',playerStatus
           client.thread= new Thread client,playerStatus,options
         .catch (error)->
@@ -75,6 +78,15 @@ class NicoliveIo extends Socketio
 
       client.on 'error',(error)->
         client.emit 'warn',error
+
+      client.on 'current',=>
+        communityId= client.playerStatus.default_community
+
+        @getPlayerStatus communityId,client.userSession
+        .then (playerStatus)->
+          client.emit 'current',playerStatus
+        .catch (error)->
+          client.emit 'current',error
       
       client.on 'disconnect',->
         client.thread.destroy() if client.thread?
@@ -103,11 +115,12 @@ class NicoliveIo extends Socketio
       id= $('id').eq(0).text()
       title= $('title').eq(0).text()
       picture_url= $('picture_url').eq(0).text()
+      default_community= $('default_community').eq(0).text()
 
       {
         port,addr,thread
         user_id,premium
-        id,title,picture_url
+        id,title,picture_url,default_community
         xml
       }
 
@@ -123,6 +136,17 @@ class NicoliveIo extends Socketio
       [...,postkey]= postkeyBody.split '='
 
       postkey
+
+  heartbeat: (nicoliveId)->
+    url= api.heartbeat+'?v='+nicoliveId
+
+    request
+      url: url
+      headers:
+        Cookie: 'user_session='+userSession
+    .spread (response,body)->
+
+      body
 
   fetchNickname: (userId)->
     url= api.fetchNickname+'?id='+userId

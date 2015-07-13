@@ -65,6 +65,18 @@ describe 'nicoliveIo',->
       expect(addr).toBeTruthy()
       expect(thread).toBeTruthy()
 
+    client.on 'getplayerstatus',(playerStatus)->
+      {port,addr,thread}= playerStatus
+      expect(port).toBeGreaterThan 200
+      expect(addr).toMatch /.live.nicovideo.jp$/
+      expect(thread).toBeGreaterThan 1000000000
+
+      {id,title,picture_url,default_community}= playerStatus
+      expect(id).toMatch /^lv/
+      expect(title).toBe 'Nsen - 蛍の光チャンネル'
+      expect(picture_url).toMatch 'http://nl.simg.jp/img/a35/103321.39a510.jpg'
+      expect(default_community).toBe ''
+
     last_res= null
     client.on 'thread',(thread)->
       expect(thread.resultcode).toBe '0'
@@ -83,17 +95,6 @@ describe 'nicoliveIo',->
     comment+= if process.env.TRAVIS then 'TravisCI' else 'NicoliveIo'
 
     client.emit 'view','nsen/hotaru'
-    client.on 'getplayerstatus',(playerStatus)->
-      {port,addr,thread}= playerStatus
-      expect(port).toBeGreaterThan 200
-      expect(addr).toMatch /.live.nicovideo.jp$/
-      expect(thread).toBeGreaterThan 1000000000
-
-      {id,title,picture_url}= playerStatus
-      expect(id).toMatch /^lv/
-      expect(title).toBe 'Nsen - 蛍の光チャンネル'
-      expect(picture_url).toMatch 'http://nl.simg.jp/img/a35/103321.39a510.jpg'
-
     client.on 'thread',(thread)->
       expect(thread.resultcode).toBe '0'
       expect(thread.revision).toBe '1'
@@ -108,6 +109,27 @@ describe 'nicoliveIo',->
         expect(chat_result.text).toBe comment
 
         done()
+
+  describe '(Unstable)Found current live',->
+    it 'old to current',(done)->
+      client.emit 'view','lv227889668'
+      client.on 'end_of_thread',(chat)->
+        client.emit 'current'
+        client.on 'current',(playerStatus)->
+          {port,addr,thread}= playerStatus
+          expect(port).toBeGreaterThan 200
+          expect(addr).toMatch /.live.nicovideo.jp$/
+          expect(thread).toBeGreaterThan 1000000000
+
+          {id,title,picture_url,default_community}= playerStatus
+          expect(id).toMatch /^lv/
+          expect(title).toMatch 'ブラウザベースのコメントビューアつくってる'
+          expect(picture_url).toMatch 'http://icon.nimg.jp/community/218/co2183236.jpg'
+          expect(default_community).toBe 'co2183236'
+
+          done()
+
+  xdescribe 'TODO: heartbeat'
 
   describe 'Error handling',->
     it 'invalid auth',(done)->
@@ -140,5 +162,3 @@ describe 'nicoliveIo',->
         expect(error).toBe 'idは数字を入力してください'
         expect(nickname).toBeUndefined()
         done()
-
-  xit 'TODO: reconnect issue #1',->
