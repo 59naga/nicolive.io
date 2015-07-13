@@ -21,7 +21,7 @@ $ npm install nicolive.io --save
 
 ### デモ
 
-[![](https://cloud.githubusercontent.com/assets/1548478/8640887/ae278f0c-2942-11e5-84cf-24604ec7f86c.png)](http://nicolive.berabou.me/)
+[![](https://cloud.githubusercontent.com/assets/1548478/8640887/ae278f0c-2942-11e5-84cf-24604ec7f86c.png)](https://github.com/59naga/nicolive.berabou.me)
 
 Angular-Materialを使用したデモです。
 
