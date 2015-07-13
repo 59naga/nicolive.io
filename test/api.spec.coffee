@@ -110,12 +110,13 @@ describe 'nicoliveIo',->
 
         done()
 
-  describe '(Unstable)Found current live',->
+  describe 'Found current live',->
     it 'old to current',(done)->
       client.emit 'view','lv227889668'
-      client.on 'end_of_thread',(chat)->
-        client.emit 'current'
-        client.on 'current',(playerStatus)->
+      client.once 'end_of_thread',(chat)->
+        client.emit 'current',(error,playerStatus)->
+          expect(error).toBe null
+
           {port,addr,thread}= playerStatus
           expect(port).toBeGreaterThan 200
           expect(addr).toMatch /.live.nicovideo.jp$/

@@ -76,18 +76,18 @@ class NicoliveIo extends Socketio
         .catch (error)->
           callback error
 
-      client.on 'error',(error)->
-        client.emit 'warn',error
-
-      client.on 'current',=>
+      client.on 'current',(callback)=>
         communityId= client.playerStatus.default_community
 
         @getPlayerStatus communityId,client.userSession
         .then (playerStatus)->
-          client.emit 'current',playerStatus
+          callback null,playerStatus
         .catch (error)->
-          client.emit 'current',error
+          callback error
       
+      client.on 'error',(error)->
+        client.emit 'warn',error
+
       client.on 'disconnect',->
         client.thread.destroy() if client.thread?
         delete client.thread
