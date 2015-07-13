@@ -19,6 +19,12 @@ $ npm install nicolive.io --save
 従来のコメントビューアと同じく、ブラウザに埋め込まれた[userSession](#userSession)をクッキーから取得する手段が必要です。
 このモジュールでは、userSessionを取得していることを前提にしており、ブラウザ側のユーティリティを一切提供しません。
 
+### デモ
+
+[![](https://cloud.githubusercontent.com/assets/1548478/8640887/ae278f0c-2942-11e5-84cf-24604ec7f86c.png)](http://nicolive.berabou.me/)
+
+Angular-Materialを使用したデモです。
+
 # API
 
 ## class `NicoliveIo` constructor(requestListener) -> nicoliveIo
