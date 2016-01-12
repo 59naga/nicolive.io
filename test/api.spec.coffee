@@ -57,7 +57,7 @@ describe 'nicoliveIo',->
     client.disconnect()
     nicoliveIo.close done
 
-  it 'anonymous comment at nsen/hotaru',(done)->
+  xit 'anonymous comment at nsen/hotaru',(done)->
     comment= Date.now()+' via '
     comment+= if process.env.TRAVIS then 'TravisCI' else 'NicoliveIo'
 
@@ -106,7 +106,7 @@ describe 'nicoliveIo',->
 
   describe 'Found current live',->
     it 'old to current',(done)->
-      client.emit 'view','lv227889668'
+      client.emit 'view','lv248741026'
       client.once 'end_of_thread',(chat)->
         client.emit 'current',(error,playerStatus)->
           expect(error).toBe null
@@ -118,11 +118,17 @@ describe 'nicoliveIo',->
 
           {id,title,picture_url,default_community}= playerStatus
           expect(id).toMatch /^lv/
-          expect(title).toMatch 'ブラウザベースのコメントビューアつくってる'
-          expect(picture_url).toMatch 'http://icon.nimg.jp/community/218/co2183236.jpg'
-          expect(default_community).toBe 'co2183236'
+          expect(title).toMatch '【Duelyst】オレオレミッドレンジAbyssianでランク #13'
+          expect(picture_url).toMatch 'http://icon.nimg.jp/community/312/co3120283.jpg'
+          expect(default_community).toBe 'co3120283'
 
           done()
+
+  describe 'Expired 30 hour',->
+    it '',(done)->
+      client.emit 'view','lv248741026'
+      client.on 'getplayerstatus',(playerStatus)->
+        done()
 
   xdescribe 'TODO: heartbeat'
 
@@ -149,7 +155,7 @@ describe 'nicoliveIo',->
     it 'fetch nickname',(done)->
       client.emit 'nickname',143728,(error,nickname)->
         expect(error).toBe null
-        expect(nickname).toBe '59'
+        expect(nickname).toBe '59naga'
         done()
 
     it 'invalid id',(done)->
