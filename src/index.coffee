@@ -72,7 +72,7 @@ class NicoliveIo extends Socketio
 
       id= setInterval ->
         return unless client.playerStatus?.end_time
-        return unless Date.now() > client.playerStatus?.end_time*1000
+        return unless client.playerStatus?.end_time < Date.now()/1000
 
         client.emit 'half_hour'
         clearInterval id
