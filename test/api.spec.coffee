@@ -106,13 +106,20 @@ describe 'nicoliveIo',->
         done() if i is 5
 
   describe 'clientEvent .createNextStream ',->
+    # always closed at timeshift live if basic user(not premium)
+    xit 'Should fire `half_hour` event if elapsed 30 min',(done)->
+      client.emit 'view',hasTimeshiftLive
+      client.once 'half_hour',()->
+        done()
+
     it 'Should pass the Next-stream id or error to callback',(done)->
       client.emit 'createNextStream',hasTimeshiftLive,(error,nextSreamId)->
         expect(error).toBe 'コミュニティの作成・管理、ユーザー生放送はプレミアム会員のみご利用いただけます。'
 
         done()
 
-  xdescribe 'Found current live',-># always closed at timeshift live if basic user(not premium)
+  # always closed at timeshift live if basic user(not premium)
+  xdescribe 'Found current live',->
     it 'old to current',(done)->
       client.emit 'view',hasTimeshiftLive
       client.once 'end_of_thread',(chat)->

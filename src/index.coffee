@@ -70,6 +70,14 @@ class NicoliveIo extends Socketio
         .catch (error)->
           client.emit 'error',error
 
+      id= setInterval ->
+        return unless client.playerStatus?.end_time
+        return unless Date.now() > client.playerStatus?.end_time*1000
+
+        client.emit 'half_hour'
+        clearInterval id
+      ,1000
+
       client.on 'createNextStream',(nicoliveId,callback)=>
         @createNextStream nicoliveId,client.userSession
         .then (data)->
@@ -101,6 +109,8 @@ class NicoliveIo extends Socketio
         client.thread.destroy() if client.thread?
         delete client.thread
 
+        clearInterval id
+
   getPlayerStatus: (nicoliveId,userSession)->
     url= util.format api.getPlayerStatus,nicoliveId
 
@@ -126,11 +136,15 @@ class NicoliveIo extends Socketio
       picture_url= $('picture_url').eq(0).text()
       default_community= $('default_community').eq(0).text()
 
+      end_time= $('end_time').eq(0).text()
+
       {
         port,addr,thread
         user_id,premium
         id,title,picture_url,default_community
         xml
+
+        end_time
       }
 
   getPostKey: ({thread,last_res},userSession)->

@@ -1,6 +1,6 @@
 {
   "name": "nicolive.io",
-  "version": "0.0.2-beta",
+  "version": "0.0.2-beta.1",
   "description": "socket.io wrapper for live.nicovideo.jp",
 
   "scripts": {
