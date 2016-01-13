@@ -138,6 +138,10 @@ clientにauthorizedイベントを送信済みであれば、コメントしま�
 
 clientがdisconnectメソッドを実行すると、サーバーはただちにtcpを切断します。
 
+### clientSocketEvent:`createNextStream`
+
+clientがプレミアム会員であれば、第一引数の配信idの情報を使用して、放送枠を作成します。
+
 ## `window.io`
 
 クライアントは、まず初めにsocket.ioの依存ファイルである/socket.io/socket.io.jsを読み込む必要があります。以下はportを59798でサーバーを起動した場合の例です。
@@ -386,6 +390,18 @@ serverSocket.emit('nickname',9999999999,function(error,nickname){
 serverSocket.emit('nickname','invalid',function(error,nickname){
   console.log(error);// idは数字を入力してください
   console.log(nickname);// undefined
+});
+```
+
+## serverSocket.emit('createNextStream',preventStreamId,callback) -> {error,nextSreamId}
+
+自動次枠取得を試みます。枠内容は`preventStreamId`を参照します。
+__この機能は実験的です。__
+
+```js
+serverSocket.emit('createNextStream','lv248741026',function(error,nextSreamId){
+  console.log(error);// 'コミュニティの作成・管理、ユーザー生放送はプレミアム会員のみご利用いただけます。'
+  console.log(nextSreamId);// undefined
 });
 ```
 

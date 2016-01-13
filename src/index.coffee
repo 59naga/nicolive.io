@@ -18,6 +18,7 @@ api=
   getPostKey: 'http://live.nicovideo.jp/api/getpostkey'
   heartbeat: 'http://live.nicovideo.jp/api/heartbeat?v='
   fetchNickname: 'http://seiga.nicovideo.jp/api/user/info'
+  editStream: 'http://live.nicovideo.jp/editstream'
 
 # Public
 class NicoliveIo extends Socketio
@@ -68,6 +69,14 @@ class NicoliveIo extends Socketio
           client.thread?.comment comment,attributes
         .catch (error)->
           client.emit 'error',error
+
+      client.on 'createNextStream',(nicoliveId,callback)=>
+        @createNextStream nicoliveId,client.userSession
+        .then (data)->
+          callback null,data
+
+        .catch (error)->
+          callback error
 
       client.on 'nickname',(userId,callback)=>
         @fetchNickname userId
@@ -165,6 +174,100 @@ class NicoliveIo extends Socketio
 
   close: ->
     @server.close arguments...
+
+  # TODO: switching methods to another class (e.g. ownerClass)
+  createNextStream: (nicoliveId,session)->
+    url= api.editStream+'?reuseid='+nicoliveId.slice(2)
+
+    request
+      url: url
+      headers:
+        Cookie: 'user_session='+session
+    .spread (response,body)=>
+      $= cheerio.load body
+      $error= $('.plus strong')
+      return Promise.reject $error.text() if $error.text()
+
+      data= @scrapeFormValues body
+
+      request
+        method: 'POST'
+        url: api.editStream
+        formData: data
+        headers:
+          Cookie: 'user_session='+session
+
+    .spread (response,body)=>
+      data= @scrapeFormValues body
+      data.kiyaku= 'true'
+
+      request
+        method: 'POST'
+        url: api.editStream
+        formData: data
+        headers:
+          Cookie: 'user_session='+session
+        followRedirect: true
+
+    .spread (response,body)->
+      $= cheerio.load body
+      $error= $('#error_message')
+      return Promise.reject $error.text().trim() if response.statusCode isnt 302
+
+      for header in response.rawHeaders
+        return (header.match /^watch\/(.+)/)?[1] if header.match /^watch\//
+
+      return
+
+  scrapeFormValues: (body,data={})->
+    $= cheerio.load body
+    $form= $('form[action=editstream]')
+
+    for input in $form.find('input')
+      $input= $(input)
+
+      name= $input.attr('name')
+      type= $input.attr('type')
+      value= $input.val()
+      checked= $input.attr('checked') is 'checked'
+
+      switch type
+        when 'button' then null
+
+        when 'checkbox'
+          @push(data,name,value) if checked
+        when 'radio'
+          @push(data,name,value) if checked
+
+        else
+          @push(data,name,value)
+
+    for select in $form.find('select')
+      $select= $(select)
+
+      name= $select.attr('name')
+      value= $select.val()
+
+      @push(data,name,value)
+
+    for textarea in $form.find('textarea')
+      $textarea= $(textarea)
+
+      name= $textarea.attr('name')
+      value= $textarea.text()
+
+      @push(data,name,value)
+
+    data
+
+  push: (data,name,value)->
+    return unless name
+
+    if name.slice(-2) is '[]'
+      data[name]?= []
+      data[name].push value
+    else
+      data[name]?= value
 
 module.exports= new NicoliveIo
 module.exports.NicoliveIo= NicoliveIo

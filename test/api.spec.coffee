@@ -10,6 +10,7 @@ request= Promise.promisify(require 'request')
 # Environment
 port= 59798
 userSession= process.env.SESSION
+hasTimeshiftLive= 'lv248741026'
 
 throw new Error 'process.env.SESSION is undefined' unless userSession
 
@@ -57,7 +58,7 @@ describe 'nicoliveIo',->
     client.disconnect()
     nicoliveIo.close done
 
-  xit 'anonymous comment at nsen/hotaru',(done)->
+  it 'anonymous comment at nsen/hotaru',(done)->
     comment= Date.now()+' via '
     comment+= if process.env.TRAVIS then 'TravisCI' else 'NicoliveIo'
 
@@ -104,9 +105,16 @@ describe 'nicoliveIo',->
 
         done() if i is 5
 
-  describe 'Found current live',->
+  describe 'clientEvent .createNextStream ',->
+    it 'Should pass the Next-stream id or error to callback',(done)->
+      client.emit 'createNextStream',hasTimeshiftLive,(error,nextSreamId)->
+        expect(error).toBe 'コミュニティの作成・管理、ユーザー生放送はプレミアム会員のみご利用いただけます。'
+
+        done()
+
+  xdescribe 'Found current live',-># always closed at timeshift live if basic user(not premium)
     it 'old to current',(done)->
-      client.emit 'view','lv248741026'
+      client.emit 'view',hasTimeshiftLive
       client.once 'end_of_thread',(chat)->
         client.emit 'current',(error,playerStatus)->
           expect(error).toBe null
@@ -123,12 +131,6 @@ describe 'nicoliveIo',->
           expect(default_community).toBe 'co3120283'
 
           done()
-
-  describe 'Expired 30 hour',->
-    it '',(done)->
-      client.emit 'view','lv248741026'
-      client.on 'getplayerstatus',(playerStatus)->
-        done()
 
   xdescribe 'TODO: heartbeat'
 
