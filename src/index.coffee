@@ -53,6 +53,16 @@ class NicoliveIo extends Socketio
 
           client.emit 'getplayerstatus',playerStatus
           client.thread= new Thread client,playerStatus,options
+
+          clearInterval client.timerId
+          client.timerId= setInterval ->
+            return unless client.playerStatus?.end_time
+            return unless client.playerStatus?.end_time < Date.now()/1000
+
+            client.emit 'half_hour'
+            clearInterval client.timerId
+          ,1000
+
         .catch (error)->
           client.emit 'error',error
           
@@ -69,14 +79,6 @@ class NicoliveIo extends Socketio
           client.thread?.comment comment,attributes
         .catch (error)->
           client.emit 'error',error
-
-      id= setInterval ->
-        return unless client.playerStatus?.end_time
-        return unless client.playerStatus?.end_time < Date.now()/1000
-
-        client.emit 'half_hour'
-        clearInterval id
-      ,1000
 
       client.on 'createNextStream',(nicoliveId,callback)=>
         @createNextStream nicoliveId,client.userSession
@@ -109,7 +111,7 @@ class NicoliveIo extends Socketio
         client.thread.destroy() if client.thread?
         delete client.thread
 
-        clearInterval id
+        clearInterval client.timerId
 
   getPlayerStatus: (nicoliveId,userSession)->
     url= util.format api.getPlayerStatus,nicoliveId
