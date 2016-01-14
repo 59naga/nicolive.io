@@ -16,7 +16,7 @@ status= require './status'
 api=
   getPlayerStatus: 'http://live.nicovideo.jp/api/getplayerstatus/%s'
   getPostKey: 'http://live.nicovideo.jp/api/getpostkey'
-  heartbeat: 'http://live.nicovideo.jp/api/heartbeat?v='
+  heartbeat: 'http://live.nicovideo.jp/api/heartbeat'
   fetchNickname: 'http://seiga.nicovideo.jp/api/user/info'
   editStream: 'http://live.nicovideo.jp/editstream'
 
@@ -107,11 +107,18 @@ class NicoliveIo extends Socketio
       client.on 'error',(error)->
         client.emit 'warn',error
 
+      client.heartbeatId= setInterval =>
+        return unless client.playerStatus?.id
+
+        @heartbeat client.playerStatus.id,client.userSession
+      ,60*1000 * 2#min
+
       client.on 'disconnect',->
         client.thread.destroy() if client.thread?
         delete client.thread
 
         clearInterval client.timerId
+        clearInterval client.heartbeatId
 
   getPlayerStatus: (nicoliveId,userSession)->
     url= util.format api.getPlayerStatus,nicoliveId
@@ -162,11 +169,21 @@ class NicoliveIo extends Socketio
 
       postkey
 
-  heartbeat: (nicoliveId)->
-    url= api.heartbeat+'?v='+nicoliveId
+  # http://blog.ingen084.net/blog/1691
+  heartbeat: (nicoliveId,userSession)->
+    url= api.heartbeat
 
     request
+      method: 'POST'
       url: url
+      formData:
+        lang: 'ja-jp'
+        locale: 'JP'
+        seat_locale: 'JP'
+        screen: 'ScreenNormal'
+        v: nicoliveId
+        datarate: '0'
+
       headers:
         Cookie: 'user_session='+userSession
     .spread (response,body)->
