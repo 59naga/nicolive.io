@@ -78,11 +78,14 @@ class Thread extends Socket
 
   comment: (comment,attributes)->
     {thread,ticket}= @attributes
-    {user_id,premium}= @playerStatus
+    {user_id,premium,open_time}= @playerStatus
+
+    # 開場時間からの経過秒数 * 100（恐らく）
+    vpos= (Math.floor(Date.now()/1000) - @playerStatus.open_time) * 100
 
     $= cheerio.load '<chat/>',{xmlMode:yes}
     $chat= $ 'chat'
-    $chat.attr {thread,ticket,user_id,premium}
+    $chat.attr {thread,ticket,user_id,premium,vpos}
     $chat.attr attributes
     $chat.text comment.toString()
     data= $.html()+'\0'

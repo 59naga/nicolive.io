@@ -1,10 +1,10 @@
 {
   "name": "nicolive.io",
-  "version": "0.0.2-beta.4",
+  "version": "0.0.2",
   "description": "socket.io wrapper for live.nicovideo.jp",
 
   "scripts": {
-    "start": "jasminetea --watch --timeout 1000",
+    "start": "jasminetea --watch --timeout 10000",
     "test": "jasminetea --lint --cover --report --timeout 10000",
 
     "prepublish": "node -e \"if(process.env.TRAVIS){}else{process.exit(1)}\" && npm run compile || echo skip prepublish",

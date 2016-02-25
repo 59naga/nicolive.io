@@ -145,6 +145,7 @@ class NicoliveIo extends Socketio
       picture_url= $('picture_url').eq(0).text()
       default_community= $('default_community').eq(0).text()
 
+      open_time= $('open_time').eq(0).text()
       end_time= $('end_time').eq(0).text()
 
       {
@@ -153,6 +154,7 @@ class NicoliveIo extends Socketio
         id,title,picture_url,default_community
         xml
 
+        open_time
         end_time
       }
 
